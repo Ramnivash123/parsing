@@ -1,7 +1,8 @@
-Flask
-SpeechRecognition
+flask
 python-docx
-gTTS
-pygame
 numpy
+sounddevice
 soundfile
+whisper
+gtts
+pygame
