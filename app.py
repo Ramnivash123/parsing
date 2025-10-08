@@ -1,8 +1,8 @@
-from flask import Flask, render_template, request, redirect, url_for, jsonify, send_file
-import os, threading, tempfile
-import wave
-import speech_recognition as sr
-import parser  # your modified parser.py
+from flask import Flask, render_template, request, redirect, url_for, jsonify
+import os, threading
+import parser  # your parser.py
+from flask import send_file
+
 
 app = Flask(__name__)
 app.config["UPLOAD_FOLDER"] = "uploads"
@@ -66,7 +66,6 @@ def progress():
         "items": parser.qa_progress
     })
 
-
 @app.route("/download_answers")
 def download_answers():
     """Allow user to download the answers.docx file."""
@@ -77,36 +76,6 @@ def download_answers():
         return jsonify({"error": "File not found"}), 404
 
 
-@app.route("/transcribe_audio", methods=["POST"])
-def transcribe_audio():
-    if "file" not in request.files:
-        return jsonify({"error": "No audio file provided"}), 400
-
-    audio_file = request.files["file"]
-    if audio_file.filename == "":
-        return jsonify({"error": "Empty filename"}), 400
-
-    # Save to temp file
-    with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as tf:
-        audio_file.save(tf.name)
-        temp_path = tf.name
-
-    # Use SpeechRecognition to transcribe with Google API
-    recognizer = sr.Recognizer()
-    with sr.AudioFile(temp_path) as source:
-        audio_data = recognizer.record(source)  # read the entire audio file
-
-    try:
-        text = recognizer.recognize_google(audio_data)
-    except sr.UnknownValueError:
-        text = "[Unrecognized speech]"
-    except sr.RequestError as e:
-        text = f"[Speech API error: {e}]"
-
-    os.remove(temp_path)
-    return jsonify({"text": text})
-
-
-if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 5000))
-    app.run(host="0.0.0.0", port=port)
+if __name__ == '__main__':
+    port = int(os.environ.get('PORT', 5000))
+    app.run(host='0.0.0.0', port=port)
