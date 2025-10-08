@@ -1,7 +1,7 @@
 Flask
+SpeechRecognition
 python-docx
-numpy
-soundfile
 gTTS
 pygame
-vosk
+numpy
+soundfile
