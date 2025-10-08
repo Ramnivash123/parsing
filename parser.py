@@ -61,7 +61,6 @@ def get_all_text(doc_path):
 
 
 def clean_line(s: str) -> str:
-    import re
     return re.sub(r"\s+", " ", s.strip())
 
 
@@ -100,7 +99,6 @@ def extract_questions(path: str):
             continue
 
         if section == "A":
-            import re
             m = re.match(r"^(\d{1,2})\s+(.*)$", line)
             if m:
                 qnum, stem_text = m.groups()
@@ -171,7 +169,6 @@ def extract_metadata(path: str):
 
 
 def main():
-    # Your exam flow here, ensure answers come from frontend API calls
     timer = ExamTimer(duration_seconds=7200)
     timer.start()
 
@@ -188,7 +185,7 @@ def main():
     questions = extract_questions(INPUT_DOC)
     print(f"✅ Found {len(questions)} questions.")
 
-    # Answers should come from frontend / API integration — placeholder
+    # Answers should come from frontend / API integration — placeholder text for now
     qa_items = [{"label": q["label"], "text": q["text"], "answer": "[Answer pending from frontend]"} for q in questions]
     save_answers_docx(OUTPUT_DOC, qa_items)
     print(f"✅ Answers saved to {OUTPUT_DOC}")
