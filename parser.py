@@ -1,13 +1,13 @@
 import re
 import os
-from datetime import datetime, timedelta
 import docx
 from docx import Document
 import threading
+from datetime import datetime, timedelta
 
 qa_progress = []  # live Q&A for web
 
-# Timer class left unchanged
+
 class ExamTimer(threading.Thread):
     def __init__(self, duration_seconds=7200):
         super().__init__(daemon=True)
@@ -29,10 +29,8 @@ class ExamTimer(threading.Thread):
         return f"{hrs} hours {mins} minutes {secs} seconds remaining"
 
 
-# Your config vars and excluded substrings unchanged
 INPUT_DOC = "mugilanQp.docx"
 OUTPUT_DOC = "answers.docx"
-
 
 EXCLUDE_SUBSTRS = {
     "answer all questions",
@@ -45,8 +43,6 @@ EXCLUDE_SUBSTRS = {
     "batch:", "class:", "subject title:", "semester:",
     "mid term", "reviewer"
 }
-
-# No whisper or local recording imports
 
 
 def get_all_text(doc_path):
@@ -65,6 +61,7 @@ def get_all_text(doc_path):
 
 
 def clean_line(s: str) -> str:
+    import re
     return re.sub(r"\s+", " ", s.strip())
 
 
@@ -102,8 +99,8 @@ def extract_questions(path: str):
             i += 1
             continue
 
-        # Section A - MCQ questions (unchanged)
         if section == "A":
+            import re
             m = re.match(r"^(\d{1,2})\s+(.*)$", line)
             if m:
                 qnum, stem_text = m.groups()
@@ -118,23 +115,19 @@ def extract_questions(path: str):
             else:
                 i += 1
                 continue
-
             options = {}
             while i < len(lines) and re.match(r"^[ABCD]\b", lines[i], re.I):
                 letter = lines[i][0].upper()
                 value = lines[i][1:].strip()
                 options[letter] = value
                 i += 1
-
             text = stem_text
             for letter in ["A", "B", "C", "D"]:
                 if letter in options:
                     text += f"\n{letter}. {options[letter]}"
-
             result.append({"section": "A", "label": qnum, "text": text})
             continue
 
-        # Section B/C questions (unchanged)
         m = re.match(r"^(\d{1,2})\s*([AB])?\s*(.*)$", line)
         if section in {"B", "C"} and m:
             qnum, ab, rest = m.groups()
@@ -151,7 +144,6 @@ def extract_questions(path: str):
             text = " ".join(block)
             result.append({"section": section, "label": f"{qnum} {ab}".strip(), "text": text})
             continue
-
         i += 1
 
     return result
@@ -179,9 +171,7 @@ def extract_metadata(path: str):
 
 
 def main():
-    # This main will not do local audio recording or whisper transcription
-    # The transcription and answers must come from the web frontend or other input
-
+    # Your exam flow here, ensure answers come from frontend API calls
     timer = ExamTimer(duration_seconds=7200)
     timer.start()
 
@@ -195,20 +185,13 @@ def main():
 
     print(f"📄 Candidate: {name}, Subject: {subject}")
 
-    # You can implement logic here to wait for answers to come via frontend API or other method.
-    # For example, this could poll a database, queue, or shared variable updated by frontend endpoint.
-
-    # For demonstration, just load questions without answers
     questions = extract_questions(INPUT_DOC)
-    print(f"✅ Extracted {len(questions)} questions.")
+    print(f"✅ Found {len(questions)} questions.")
 
-    # Here instead of recording and transcribing, you await answers from frontend
-    # For testing, mark all answers skipped
-    qa_items = [{"label": q["label"], "text": q["text"], "answer": "[Pending answer via Web]"} for q in questions]
-
-    # Save placeholder answers for now
+    # Answers should come from frontend / API integration — placeholder
+    qa_items = [{"label": q["label"], "text": q["text"], "answer": "[Answer pending from frontend]"} for q in questions]
     save_answers_docx(OUTPUT_DOC, qa_items)
-    print(f"✅ Saved placeholder answers to {OUTPUT_DOC}")
+    print(f"✅ Answers saved to {OUTPUT_DOC}")
 
 
 if __name__ == "__main__":
