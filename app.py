@@ -11,7 +11,7 @@ exam_running = False
 uploaded_docx = None
 
 # Load Vosk model once (adjust path if needed)
-vosk_model = Model("vosk-model-en-us-0.22")  # Download this and place in project root or proper path
+vosk_model = Model("/app/vosk-model-en-us-0.22")
 
 
 def transcribe_vosk_audio(file_path):
