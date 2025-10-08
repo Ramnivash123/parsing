@@ -1,0 +1,8 @@
+flask
+python-docx
+numpy
+sounddevice
+soundfile
+whisper
+gtts
+pygame
